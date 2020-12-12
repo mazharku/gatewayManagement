@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mazhar.gateway.exception.ResourceNotFoundException;
 import com.mazhar.gateway.model.Gateway;
 import com.mazhar.gateway.model.Peripheral;
-import com.mazhar.gateway.repository.GateWayRepository;
+import com.mazhar.gateway.repository.GatewayRepository;
 
 /**
  * @author mazhar
@@ -33,11 +33,11 @@ import com.mazhar.gateway.repository.GateWayRepository;
  */
 @RestController
 @RequestMapping("/api/v1")
-public class GateWayController {
+public class GatewayController {
 	
 	
 	@Autowired
-	private GateWayRepository repository;
+	private GatewayRepository repository;
 
 	@GetMapping("/gateways")
 	public List<Gateway> getAllGateways() {
@@ -45,10 +45,10 @@ public class GateWayController {
 	}
 
 	@GetMapping("/gateway/{id}")
-	public ResponseEntity<Gateway> getGatewayById(@PathVariable(value = "id") String employeeId)
+	public ResponseEntity<Gateway> getGatewayById(@PathVariable(value = "id") String id)
 			throws ResourceNotFoundException {
-		Gateway gateway = repository.findById(employeeId)
-				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + employeeId));
+		Gateway gateway = repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + id));
 		return ResponseEntity.ok().body(gateway);
 	}
 
@@ -62,9 +62,10 @@ public class GateWayController {
 	    if (devices.size()>=10) {
 	    	throw new ResourceNotFoundException("no more than 10 peripheral devices are allowed for a gateway.");
 	    }
-	    if (!isValidIPAddress(ipAddress)) {
-	    	throw new ResourceNotFoundException("Please provide a valid ip address!");
-	    }
+		/*
+		 * if (!isValidIPAddress(ipAddress)) { throw new
+		 * ResourceNotFoundException("Please provide a valid ip address!"); }
+		 */
 		return repository.save(gateway);
 	}
 
@@ -87,10 +88,10 @@ public class GateWayController {
 	}
 
 	@DeleteMapping("/gateway/{id}")
-	public Map<String, Boolean> deleteGateway(@PathVariable(value = "id") String employeeId)
+	public Map<String, Boolean> deleteGateway(@PathVariable(value = "id") String id)
 			throws ResourceNotFoundException {
-		Gateway gateway = repository.findById(employeeId)
-				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + employeeId));
+		Gateway gateway = repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + id));
 
 		repository.delete(gateway);
 		Map<String, Boolean> response = new HashMap<>();

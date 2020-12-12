@@ -14,6 +14,6 @@ import com.mazhar.gateway.model.Gateway;
  * Dec 12, 2020
  */
 @Repository
-public interface GateWayRepository extends JpaRepository<Gateway, String>{
+public interface GatewayRepository extends JpaRepository<Gateway, String>{
 
 }
