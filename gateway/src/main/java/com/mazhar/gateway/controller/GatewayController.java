@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.bind.ValidationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +27,7 @@ import com.mazhar.gateway.exception.ResourceNotFoundException;
 import com.mazhar.gateway.model.Gateway;
 import com.mazhar.gateway.model.Peripheral;
 import com.mazhar.gateway.repository.GatewayRepository;
+import com.mazhar.gateway.util.GatewayUtil;
 
 /**
  * @author mazhar
@@ -53,19 +56,28 @@ public class GatewayController {
 	}
 
 	@PostMapping(path = "/gateway", consumes = "application/json", produces = "application/json")
-	public Gateway createGateway(@Validated @RequestBody Gateway gateway) throws ResourceNotFoundException {
-	    String ipAddress = gateway.getIpAddress();
-	    List<Peripheral> devices = gateway.getPeripherals();
-	    if (devices!=null && !devices.isEmpty()) {
-	    	
-	    }
-	    if (devices.size()>=10) {
-	    	throw new ResourceNotFoundException("no more than 10 peripheral devices are allowed for a gateway.");
-	    }
-		/*
-		 * if (!isValidIPAddress(ipAddress)) { throw new
-		 * ResourceNotFoundException("Please provide a valid ip address!"); }
-		 */
+	public Gateway createGateway(@Validated @RequestBody Gateway gateway) throws ResourceNotFoundException, ValidationException {
+		String ipAddress = gateway.getIpAddress();
+		List<Peripheral> devices = gateway.getPeripherals();
+		if (devices != null && !devices.isEmpty()) {
+             for (Peripheral device : devices) {
+            	 String date = device.getCreateDate().toString();
+            	 if(date==null) {
+            		 date = "";
+            	 }
+            	 if(!GatewayUtil.isValidDateFormat(date)) {
+            		 throw new ValidationException("please provide a valid date format like yyyy-mm-dd");
+            	 }
+             }
+		}
+		if (devices.size() >= 10) {
+			throw new ResourceNotFoundException("no more than 10 peripheral devices are allowed for a gateway.");
+		}
+
+		if (!GatewayUtil.isValidIPAddress(ipAddress)) {
+			throw new ResourceNotFoundException("Please provide a valid ip address!");
+		}
+
 		return repository.save(gateway);
 	}
 
@@ -74,15 +86,13 @@ public class GatewayController {
 			@Validated @RequestBody Gateway gatewayDetails) throws ResourceNotFoundException {
 		Gateway gateway = repository.findById(gatewayId)
 				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + gatewayId));
-		 //gateway.setSerialNo(gatewayDetails.getSerialNo());
-         gateway.setDeleted(gatewayDetails.isDeleted());
-         gateway.setGateayName(gatewayDetails.getGateayName());
-		/*
-		 * if(!isValidIPAddress(gatewayDetails.getIpAddress())){ throw new
-		 * ResourceNotFoundException("Please provide a valid ip address!"); }
-		 */
-         gateway.setIpAddress(gatewayDetails.getIpAddress());
-         gateway.setPeripherals(gatewayDetails.getPeripherals());
+		gateway.setDeleted(gatewayDetails.isDeleted());
+		gateway.setGateayName(gatewayDetails.getGateayName());
+		if (!GatewayUtil.isValidIPAddress(gatewayDetails.getIpAddress())) {
+			throw new ResourceNotFoundException("Please provide a valid ip address!");
+		}
+		gateway.setIpAddress(gatewayDetails.getIpAddress());
+		gateway.setPeripherals(gatewayDetails.getPeripherals());
 		final Gateway updatedgateWay = repository.save(gateway);
 		return ResponseEntity.ok(updatedgateWay);
 	}

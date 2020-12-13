@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.ValidationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,6 +27,7 @@ import com.mazhar.gateway.model.Gateway;
 import com.mazhar.gateway.model.Peripheral;
 import com.mazhar.gateway.repository.GatewayRepository;
 import com.mazhar.gateway.repository.PeripheralRepository;
+import com.mazhar.gateway.util.GatewayUtil;
 
 /**
  * @author mazhar
@@ -51,13 +54,18 @@ public class PeripheralController {
 	}
 
 	@PostMapping(path = "/gateway/{id}/device", consumes = "application/json", produces = "application/json")
-	public Peripheral createDevice(@PathVariable(value = "id") String id, @Validated @RequestBody Peripheral device) throws ResourceNotFoundException {
+	public Peripheral createDevice(@PathVariable(value = "id") String id, @Validated @RequestBody Peripheral device) throws ResourceNotFoundException, ValidationException {
 		Gateway gateway = gatewayRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + id));
-		
+		if(!GatewayUtil.isValidDateFormat(device.getCreateDate().toString())) {
+			 throw new ValidationException("please provide a valid date format like yyyy-mm-dd");
+		}
 		List<Peripheral> list = gateway.getPeripherals();
 		if (list == null) {
 			list = new ArrayList<Peripheral>();
+		}
+		if(list.size()>=10) {
+			throw new ValidationException("already max number of devices added to this GateWay!");
 		}
 		list.add(device);
 		gateway.setPeripherals(list);
