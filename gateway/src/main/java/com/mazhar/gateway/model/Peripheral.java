@@ -64,4 +64,42 @@ public class Peripheral extends BaseModel {
 		this.status = status;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((VendorName == null) ? 0 : VendorName.hashCode());
+		result = prime * result + ((createDate == null) ? 0 : createDate.hashCode());
+		result = prime * result + id;
+		result = prime * result + (status ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Peripheral other = (Peripheral) obj;
+		if (VendorName == null) {
+			if (other.VendorName != null)
+				return false;
+		} else if (!VendorName.equals(other.VendorName))
+			return false;
+		if (createDate == null) {
+			if (other.createDate != null)
+				return false;
+		} else if (!createDate.equals(other.createDate))
+			return false;
+		if (id != other.id)
+			return false;
+		if (status != other.status)
+			return false;
+		return true;
+	}
+	
+
 }

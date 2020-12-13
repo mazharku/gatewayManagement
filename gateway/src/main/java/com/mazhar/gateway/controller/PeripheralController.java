@@ -75,19 +75,21 @@ public class PeripheralController {
 	@DeleteMapping("/gateway/{id}/device/{deviceId}")
 	public Map<String, Boolean> deleteDevice(@PathVariable(value = "id") String id,
 			@PathVariable(value = "deviceId") int deviceId) throws ResourceNotFoundException {
-		Gateway gateway = gatewayRepo.findById(id)
+		 Map<String, Boolean> response = new HashMap<>();
+		/*Gateway gateway = gatewayRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + id));
         List<Peripheral> list = gateway.getPeripherals();
         Map<String, Boolean> response = new HashMap<>();
         for (Peripheral peripheral : list) {
         	if(peripheral.getId()==deviceId) {
         		peripheralRepo.delete(peripheral);
+        		gatewayRepo.save(gateway);
         		response.put("deleted", Boolean.TRUE);
         		break;
         	}
-        	response.put("deleted", Boolean.FALSE);
-        }
-		
+        	response.put("deleted", Boolean.FALSE);*/
+		peripheralRepo.deleteCascade(deviceId);
+	    response.put("deleted", Boolean.TRUE);
 		return response;
 		
 	}
