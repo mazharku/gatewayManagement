@@ -3,11 +3,10 @@
  */
 package com.mazhar.gateway.controller;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.bind.ValidationException;
 
@@ -61,11 +60,11 @@ public class GatewayController {
 		List<Peripheral> devices = gateway.getPeripherals();
 		if (devices != null && !devices.isEmpty()) {
              for (Peripheral device : devices) {
-            	 String date = device.getCreateDate().toString();
+            	 Date date = device.getCreateDate();
             	 if(date==null) {
-            		 date = "";
+            		continue;
             	 }
-            	 if(!GatewayUtil.isValidDateFormat(date)) {
+            	 if(!GatewayUtil.isValidDateFormat(date.toString())) {
             		 throw new ValidationException("please provide a valid date format like yyyy-mm-dd");
             	 }
              }

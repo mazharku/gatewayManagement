@@ -3,6 +3,7 @@
  */
 package com.mazhar.gateway.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +58,8 @@ public class PeripheralController {
 	public Peripheral createDevice(@PathVariable(value = "id") String id, @Validated @RequestBody Peripheral device) throws ResourceNotFoundException, ValidationException {
 		Gateway gateway = gatewayRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Gateway not found for this id :: " + id));
-		if(!GatewayUtil.isValidDateFormat(device.getCreateDate().toString())) {
+		Date date = device.getCreateDate();
+		if(date!=null && !GatewayUtil.isValidDateFormat(date.toString())) {
 			 throw new ValidationException("please provide a valid date format like yyyy-mm-dd");
 		}
 		List<Peripheral> list = gateway.getPeripherals();
