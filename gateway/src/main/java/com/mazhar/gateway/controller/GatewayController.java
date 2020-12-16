@@ -4,6 +4,7 @@
 package com.mazhar.gateway.controller;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import javax.xml.bind.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +35,7 @@ import com.mazhar.gateway.util.GatewayUtil;
  *
  *         Dec 12, 2020
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1")
 public class GatewayController {
@@ -40,7 +43,7 @@ public class GatewayController {
 	
 	@Autowired
 	private GatewayRepository repository;
-
+	
 	@GetMapping("/gateways")
 	public List<Gateway> getAllGateways() {
 		return repository.findAll();
@@ -58,6 +61,9 @@ public class GatewayController {
 	public Gateway createGateway(@Validated @RequestBody Gateway gateway) throws ResourceNotFoundException, ValidationException {
 		String ipAddress = gateway.getIpAddress();
 		List<Peripheral> devices = gateway.getPeripherals();
+		if(devices==null) {
+			devices = new ArrayList<>();
+		}
 		if (devices != null && !devices.isEmpty()) {
              for (Peripheral device : devices) {
             	 Date date = device.getCreateDate();
